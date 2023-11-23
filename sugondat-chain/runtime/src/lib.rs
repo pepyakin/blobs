@@ -481,9 +481,9 @@ impl pallet_collator_selection::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MaxBlobs: u32 = 100 * 1024;
-    pub const MaxBlobSize: u32 = 100 * 1024;
-    pub const MaxTotalBlobSize: u32 = 2 * 1024 * 1024;
+    pub const MaxBlobs: u32 = pallet_sugondat_blobs::MAX_BLOBS;
+    pub const MaxBlobSize: u32 = pallet_sugondat_blobs::MAX_BLOB_SIZE;
+    pub const MaxTotalBlobSize: u32 = pallet_sugondat_blobs::MAX_TOTAL_BLOB_SIZE;
 }
 
 impl pallet_sugondat_blobs::Config for Runtime {
@@ -491,6 +491,7 @@ impl pallet_sugondat_blobs::Config for Runtime {
     type MaxBlobs = MaxBlobs;
     type MaxBlobSize = MaxBlobSize;
     type MaxTotalBlobSize = MaxTotalBlobSize;
+    type WeightInfo = pallet_sugondat_blobs::weights::SubstrateWeight<Runtime>;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -537,6 +538,7 @@ mod benches {
         [pallet_sudo, Sudo]
         [pallet_collator_selection, CollatorSelection]
         [cumulus_pallet_xcmp_queue, XcmpQueue]
+        [pallet_sugondat_blobs, Blobs]
     );
 }
 

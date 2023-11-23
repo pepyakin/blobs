@@ -10,13 +10,20 @@ mod mock;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+pub mod weights;
+
+// 100KiB
+pub const MAX_BLOBS: u32 = 100 * 1024;
+pub const MAX_BLOB_SIZE: u32 = 100 * 1024;
+// 2MiB
+pub const MAX_TOTAL_BLOB_SIZE: u32 = 2 * 1024 * 1024;
 
 #[frame_support::pallet]
 pub mod pallet {
-    use sp_std::prelude::*;
-
+    pub use crate::weights::WeightInfo;
     use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
     use frame_system::pallet_prelude::*;
+    use sp_std::prelude::*;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
@@ -35,6 +42,9 @@ pub mod pallet {
         /// The maximum number of bytes of all blobs in a block.
         #[pallet::constant]
         type MaxTotalBlobSize: Get<u32>;
+
+        // The weight information of this pallet.
+        type WeightInfo: WeightInfo;
     }
 
     #[pallet::pallet]
@@ -50,6 +60,23 @@ pub mod pallet {
         extrinsic_index: u32,
         namespace_id: u32,
         blob_hash: [u8; 32],
+    }
+
+    #[cfg(feature = "runtime-benchmarks")]
+    impl<AccountId> SubmittedBlobMetadata<AccountId> {
+        pub fn new(
+            who: AccountId,
+            extrinsic_index: u32,
+            namespace_id: u32,
+            blob_hash: [u8; 32],
+        ) -> Self {
+            Self {
+                who,
+                extrinsic_index,
+                namespace_id,
+                blob_hash,
+            }
+        }
     }
 
     /// The list of all submitted blobs.
@@ -129,7 +156,10 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::call_index(0)]
-        #[pallet::weight(Weight::from_parts(10_000, 0) + T::DbWeight::get().writes(1))]
+        // TODO: the size of the blob seems to be ininfluet for the weight, the main cost is the amount
+        // of element in the BlobList, to split the cost among everyone the amount of already present element
+        // is set to half of the max possible elements
+        #[pallet::weight(T::WeightInfo::submit_blob(T::MaxBlobs::get() / 2, blob.len() as u32))]
         pub fn submit_blob(
             origin: OriginFor<T>,
             namespace_id: u32,
@@ -143,8 +173,8 @@ pub mod pallet {
             }
 
             let Some(extrinsic_index) = <frame_system::Pallet<T>>::extrinsic_index() else {
-				return Err(Error::<T>::NoExtrinsicIndex.into())
-			};
+                return Err(Error::<T>::NoExtrinsicIndex.into());
+            };
 
             let total_blobs_size = TotalBlobsSize::<T>::get();
             if total_blobs_size + blob_len > T::MaxTotalBlobSize::get() {

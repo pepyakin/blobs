@@ -1,8 +1,5 @@
-use frame_support::{
-    parameter_types,
-    traits::{ConstU32, Everything},
-};
-use frame_system as system;
+use crate as pallet_blobs;
+use frame_support::traits::{ConstU16, ConstU32, ConstU64};
 use sp_core::H256;
 use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
@@ -13,7 +10,8 @@ type Block = frame_system::mocking::MockBlock<Test>;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
-    pub enum Test {
+    pub enum Test
+    {
         System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
         Blobs: crate::{Pallet, Call, Storage, Event<T>},
     }
@@ -24,8 +22,8 @@ parameter_types! {
     pub const SS58Prefix: u8 = 42;
 }
 
-impl system::Config for Test {
-    type BaseCallFilter = Everything;
+impl frame_system::Config for Test {
+    type BaseCallFilter = frame_support::traits::Everything;
     type BlockWeights = ();
     type BlockLength = ();
     type DbWeight = ();
@@ -50,18 +48,19 @@ impl system::Config for Test {
     type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
-impl crate::Config for Test {
+impl pallet_blobs::Config for Test {
     type RuntimeEvent = RuntimeEvent;
-    type MaxBlobs = ConstU32<16>;
-    type MaxBlobSize = ConstU32<1024>;
-    type MaxTotalBlobSize = ConstU32<2048>;
+    type MaxBlobs = ConstU32<{ pallet_blobs::MAX_BLOBS }>;
+    type MaxBlobSize = ConstU32<{ pallet_blobs::MAX_BLOB_SIZE }>;
+    type MaxTotalBlobSize = ConstU32<{ pallet_blobs::MAX_TOTAL_BLOB_SIZE }>;
+    type WeightInfo = ();
 }
 
 // Build genesis storage according to the mock runtime.
 // TODO: https://github.com/thrumdev/sugondat/issues/28
 #[allow(unused)]
 pub fn new_test_ext() -> sp_io::TestExternalities {
-    system::GenesisConfig::<Test>::default()
+    frame_system::GenesisConfig::<Test>::default()
         .build_storage()
         .unwrap()
         .into()
