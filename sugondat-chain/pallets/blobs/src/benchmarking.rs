@@ -17,7 +17,7 @@ use sp_std::vec;
  --steps 10 \
  --repeat 20 \
  --template sugondat-chain/pallets/blobs/src/frame-weight-template.hbs \
- --output sugondat-chain/pallets/blobs/src/weights.rs
+ --output sugondat-chain/pallets/blobs/src/weights_with_new_setup.rs
 */
 
 #[benchmarks]
@@ -33,40 +33,26 @@ mod benchmarks {
     ) {
         let caller: T::AccountId = whitelisted_caller();
 
-        // save in the storage x random BlobMetadata
-        // because every extrinsics call all the vec will be fetch
-        // and re-written with the new BlobMetadata
-        //
-        // it shouldn't matter to use different values
-        // it is ok to use always the same SubmittedBlobMetadata,
-        let metadata = SubmittedBlobMetadata {
-            who: caller.clone(),
-            extrinsic_index: 1,
-            namespace_id: 4,
-            blob_hash: [5; 32],
-        };
-
-        // I could use repeat here if I derive clone for SubmittedBlobMetadata
-        // under the feature runtime-bechmarks
-        let mut blobs_list = BoundedVec::<_, T::MaxBlobs>::with_bounded_capacity(x as usize);
-        for _ in 0..x {
-            blobs_list.force_push(metadata.clone());
+        let mut namespace_id: u32;
+        for namespace_id in 0..x {
+            Blobs::<T>::submit_blob(
+                RawOrigin::Signed(caller.clone()).into(),
+                namespace_id,
+                namespace_id
+                    .to_le_bytes()
+                    .to_vec()
+                    .try_into()
+                    .expect("Impossible convert blob into BoundedVec"),
+            )
+            .expect("Preparation Extrinsic failed");
         }
-        BlobList::<T>::put(blobs_list);
-
-        // To mimic perfectly the behaviur the values zero
-        // should be fetched by default being TotalBlobsSize not setted up
-        if x > 0 {
-            // the effective inserted size is not relevant for the scope of the bechmark
-            TotalBlobsSize::<T>::put(x);
-        }
+        namespace_id = x;
 
         // Create a random blob that needs to be hashed on chain
         let blob: BoundedVec<u8, T::MaxBlobSize> = vec![23u8]
             .repeat(y as usize)
             .try_into()
             .expect("Impossible convert blob into BoundedVec");
-        let namespace_id = 9;
 
         #[extrinsic_call]
         _(RawOrigin::Signed(caller), namespace_id, blob);
@@ -74,7 +60,7 @@ mod benchmarks {
         // Check that an item is inserted in the BlobList and
         // the new value stored in TotalBlobSize is correct
         assert_eq!(BlobList::<T>::get().len(), x as usize + 1);
-        assert_eq!(TotalBlobsSize::<T>::get(), x + y);
+        assert_eq!(TotalBlobsSize::<T>::get(), (x * 4) + y);
     }
 
     impl_benchmark_test_suite!(Blobs, crate::mock::new_test_ext(), crate::mock::Test);
