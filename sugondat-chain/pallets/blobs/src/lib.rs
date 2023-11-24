@@ -12,12 +12,6 @@ mod mock;
 mod benchmarking;
 pub mod weights;
 
-// 100KiB
-pub const MAX_BLOBS: u32 = 100 * 1024;
-pub const MAX_BLOB_SIZE: u32 = 100 * 1024;
-// 2MiB
-pub const MAX_TOTAL_BLOB_SIZE: u32 = 2 * 1024 * 1024;
-
 #[frame_support::pallet]
 pub mod pallet {
     pub use crate::weights::WeightInfo;
@@ -56,27 +50,10 @@ pub mod pallet {
 
     #[derive(Encode, Decode, TypeInfo, MaxEncodedLen, Clone)]
     pub struct SubmittedBlobMetadata<AccountId> {
-        who: AccountId,
-        extrinsic_index: u32,
-        namespace_id: u32,
-        blob_hash: [u8; 32],
-    }
-
-    #[cfg(feature = "runtime-benchmarks")]
-    impl<AccountId> SubmittedBlobMetadata<AccountId> {
-        pub fn new(
-            who: AccountId,
-            extrinsic_index: u32,
-            namespace_id: u32,
-            blob_hash: [u8; 32],
-        ) -> Self {
-            Self {
-                who,
-                extrinsic_index,
-                namespace_id,
-                blob_hash,
-            }
-        }
+        pub who: AccountId,
+        pub extrinsic_index: u32,
+        pub namespace_id: u32,
+        pub blob_hash: [u8; 32],
     }
 
     /// The list of all submitted blobs.

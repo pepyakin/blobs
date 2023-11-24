@@ -39,7 +39,12 @@ mod benchmarks {
         //
         // it shouldn't matter to use different values
         // it is ok to use always the same SubmittedBlobMetadata,
-        let metadata = SubmittedBlobMetadata::new(caller.clone(), 1, 4, [5; 32]);
+        let metadata = SubmittedBlobMetadata {
+            who: caller.clone(),
+            extrinsic_index: 1,
+            namespace_id: 4,
+            blob_hash: [5; 32],
+        };
 
         // I could use repeat here if I derive clone for SubmittedBlobMetadata
         // under the feature runtime-bechmarks

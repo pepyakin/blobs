@@ -1,5 +1,8 @@
 use crate as pallet_blobs;
-use frame_support::traits::{ConstU16, ConstU32, ConstU64};
+use frame_support::{
+    parameter_types,
+    traits::{ConstU16, ConstU32, ConstU64},
+};
 use sp_core::H256;
 use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
@@ -10,8 +13,7 @@ type Block = frame_system::mocking::MockBlock<Test>;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
-    pub enum Test
-    {
+    pub enum Test {
         System: frame_system::{Pallet, Call, Config<T>, Storage, Event<T>},
         Blobs: crate::{Pallet, Call, Storage, Event<T>},
     }
@@ -50,9 +52,11 @@ impl frame_system::Config for Test {
 
 impl pallet_blobs::Config for Test {
     type RuntimeEvent = RuntimeEvent;
-    type MaxBlobs = ConstU32<{ pallet_blobs::MAX_BLOBS }>;
-    type MaxBlobSize = ConstU32<{ pallet_blobs::MAX_BLOB_SIZE }>;
-    type MaxTotalBlobSize = ConstU32<{ pallet_blobs::MAX_TOTAL_BLOB_SIZE }>;
+    // 100KiB
+    type MaxBlobs = ConstU32<{ 100 * 1024 }>;
+    type MaxBlobSize = ConstU32<{ 100 * 1024 }>;
+    // 2MiB
+    type MaxTotalBlobSize = ConstU32<{ 2 * 1024 * 1024 }>;
     type WeightInfo = ();
 }
 

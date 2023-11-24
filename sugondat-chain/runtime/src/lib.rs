@@ -481,9 +481,11 @@ impl pallet_collator_selection::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MaxBlobs: u32 = pallet_sugondat_blobs::MAX_BLOBS;
-    pub const MaxBlobSize: u32 = pallet_sugondat_blobs::MAX_BLOB_SIZE;
-    pub const MaxTotalBlobSize: u32 = pallet_sugondat_blobs::MAX_TOTAL_BLOB_SIZE;
+    // 100KiB
+    pub const MaxBlobs: u32 = 100 * 1024;
+    pub const MaxBlobSize: u32 = 100 * 1024;
+    // 2MiB
+    pub const MaxTotalBlobSize: u32 = 2 * 1024 * 1024;
 }
 
 impl pallet_sugondat_blobs::Config for Runtime {
