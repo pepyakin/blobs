@@ -198,7 +198,7 @@ pub mod pallet {
             let blob_len = blob.len() as u32;
             let total_blobs_size = TotalBlobsSize::<T>::get();
             if total_blobs_size + blob_len > T::MaxTotalBlobSize::get() {
-                panic!("Maximum total blob size exceeded");
+                panic!("Maximum total blobs size exceeded");
             }
             TotalBlobsSize::<T>::put(total_blobs_size + blob_len);
 
