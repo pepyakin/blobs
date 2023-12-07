@@ -9,9 +9,11 @@ Blobchains on Polkadot and Kusama
 ├──<a href="./adapters">adapters</a>: Adapters for various rollup development kits (RDK).
 │   ├── <a href="./adapters/rollkit">rollkit</a>: An adapter connecting Rollkit to Sugondat
 │   ├── <a href="./adapters/sovereign">sovereign</a>: An adapter connecting Sovereign to Sugondat.
+├──<a href="./ci">ci</a>: All CI & QA related tools.
 ├──<a href="./demo">demo</a>: Projects showcasing integration of RDKs with Sugondat.
 │   ├── <a href="./demo/rollkit">rollkit</a>: Rollkit's GM rollup.
 │   ├── <a href="./demo/sovereign">sovereign</a>: Sovereign Demo Rollup.
+├──<a href="./ci">ci</a>: CI and testing infrastructure.
 ├──<a href="./sugondat-chain">sugondat-chain</a>: Implementation of sugondat parachain.
 ├──<a href="./sugondat-shim">sugondat-shim</a>: Shim between sugondat parachain RPC and RDK adapters.
 ├──<a href="./sugondat-subxt">sugondat-subxt</a>: Bindings to Sugondat RPC.
