@@ -61,6 +61,15 @@ jobs:
     buildbase-sugondat-workspace-test:
       runs-on: ubuntu-latest
       steps:
+        - name: Free Disk Space (Ubuntu)
+          uses: jlumbroso/free-disk-space@main
+          with:
+            android: true
+            dotnet: true
+            haskell: true
+            large-packages: true
+            docker-images: true
+            swap-storage: true
         - name: Checkout
           uses: actions/checkout@v4
         - name: Set up Docker Buildx
