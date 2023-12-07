@@ -1,4 +1,4 @@
-name: build-test-linux-stable
+name: ci
 
 on:
   push:

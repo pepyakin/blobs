@@ -5,6 +5,7 @@
 # docker images smaller and trigger less rebuilds.
 
 .git
+!.git/HEAD
 ci
 bin
 target

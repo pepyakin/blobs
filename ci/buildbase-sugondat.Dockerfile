@@ -44,6 +44,10 @@ FROM builder AS sugondat-workspace-check
 
 RUN $CARGO_HOME/bin/cargo check --workspace --locked
 
+FROM builder AS sugondat-workspace-test
+
+RUN $CARGO_HOME/bin/cargo test --workspace --no-run --locked
+
 FROM builder AS sugondat-shim-release
 
 RUN $CARGO_HOME/bin/cargo build -p sugondat-shim --locked --release
