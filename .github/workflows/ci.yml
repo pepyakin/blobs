@@ -14,15 +14,29 @@ jobs:
     container:
       image: ghcr.io/pepyakin/blobs-buildbase-sugondat-workspace-check:latest
     steps:
-      - name: Remove source tree
-        run: rm -rf /sugondat
       - name: Checkout
         uses: actions/checkout@v3
         with:
           path: repo
       - name: Move
-        run: mv repo /sugondat
+        run: rm -rf /sugondat && mv repo /sugondat
       - name: Check
         working-directory: /sugondat
         shell: bash
         run: su -c "/cargo/bin/cargo +nightly-2023-10-16 check --workspace"
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/pepyakin/blobs-buildbase-sugondat-workspace-test:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: repo
+      - name: Move
+        run: rm -rf /sugondat && mv repo /sugondat
+      - name: Check
+        working-directory: /sugondat
+        shell: bash
+        run: su -c "/cargo/bin/cargo +nightly-2023-10-16 test --workspace"
