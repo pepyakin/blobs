@@ -8,18 +8,21 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
-    name: Sugondat - latest
+  check:
+    name: check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain:
-          - stable
+    container:
+      image: ghcr.io/pepyakin/blobs-buildbase-sugondat-workspace-check:latest
     steps:
-      - uses: actions/checkout@v3
-      - run: sudo apt-get install protobuf-compiler
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: rustup target add wasm32-unknown-unknown
-      - run: rustup install nightly && rustup target add wasm32-unknown-unknown --toolchain nightly
-      - run: cargo build --verbose --all
-      - run: cargo test --verbose --all
+      - name: Remove source tree
+        run: rm -rf /sugondat
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: repo
+      - name: Move
+        run: mv repo /sugondat
+      - name: Check
+        working-directory: /sugondat
+        shell: bash
+        run: su -c "/cargo/bin/cargo +nightly-2023-10-16 check --workspace"

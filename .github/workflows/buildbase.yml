@@ -1,7 +1,9 @@
 name: buildbase
 
-on: workflow_dispatch
-#  - cron: '0 6 * * *' # run the build at 6:00 UTC POSIX time
+on: 
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 6 * * *' # run the build at 6:00 UTC POSIX time
 
 # The jobs below are almost identical. Basically they build the following docker images from
 # the corresponding build targets (/stages) of the buildbase dockerfile:
