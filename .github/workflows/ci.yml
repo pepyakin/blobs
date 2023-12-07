@@ -36,7 +36,7 @@ jobs:
           path: repo
       - name: Move
         run: rm -rf /sugondat && mv repo /sugondat
-      - name: Check
+      - name: Test
         working-directory: /sugondat
         shell: bash
         run: su -c "/cargo/bin/cargo +nightly-2023-10-16 test --workspace"
