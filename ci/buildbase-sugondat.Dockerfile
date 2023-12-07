@@ -12,6 +12,7 @@ ENV CARGO_HOME=/cargo
 ENV CARGO_TARGET_DIR=/cargo_target
 ENV RUSTFLAGS=""
 ENV RUSTUP_HOME=/rustup
+ENV WASM_BUILD_WORKSPACE_HINT=/sugondat
 
 RUN mkdir -p /cargo
 RUN mkdir -p /cargo_target
