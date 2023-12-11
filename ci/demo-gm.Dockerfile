@@ -1,4 +1,6 @@
-FROM golang:1.21
+# docker build --platform linux/amd64 -f ci/demo-gm.Dockerfile -t ghcr.io/pepyakin/blobs-demo-gm:latest .
+
+FROM golang:1.21 as builder
 
 # TODO: update this
 LABEL org.opencontainers.image.source=https://github.com/pepyakin/blobs
@@ -22,3 +24,10 @@ WORKDIR /demo-rollkit
 
 RUN go mod download && go mod verify
 RUN ignite chain build
+
+FROM golang:1.21 AS prod
+
+COPY --from=builder /go/bin/gmd /usr/local/bin/gmd
+COPY ./demo/rollkit/init-local.sh /root/init-local.sh
+WORKDIR /root
+ENTRYPOINT /usr/local/bin/gmd

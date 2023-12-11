@@ -1,0 +1,25 @@
+# TODO: Do I need an explicit declaration of networks?
+
+name: sugondat
+
+services:
+  zombienet:
+    image: # TODO the image here
+    networks:
+      - local
+  shim:
+    image: ghcr.io/pepyakin/blobs-shim:latest
+    networks:
+      - local
+
+  gm:
+    image: ghcr.io/pepyakin/blobs-demo-gm:latest
+    networks: 
+      - local
+  sov:
+    image: ghcr.io/pepyakin/blobs-demo-sov:latest
+    networks:
+      - local
+
+networks:
+  local: {}
