@@ -165,7 +165,7 @@ impl Client {
     ) -> anyhow::Result<[u8; 32]> {
         let namespace_id = namespace.to_u32_be();
         let extrinsic = sugondat_subxt::sugondat::tx()
-            .blob()
+            .blobs()
             .submit_blob(namespace_id, BoundedVec(blob));
 
         let conn = self.connector.ensure_connected().await;
@@ -204,7 +204,7 @@ fn extract_timestamp(extrinsics: &[sugondat_subxt::ExtrinsicDetails]) -> anyhow:
 
 /// Iterates over the extrinsics in a block and extracts the submit_blob extrinsics.
 fn extract_blobs(extrinsics: Vec<sugondat_subxt::ExtrinsicDetails>) -> Vec<Blob> {
-    use sugondat_subxt::sugondat::blob::calls::types::SubmitBlob;
+    use sugondat_subxt::sugondat::blobs::calls::types::SubmitBlob;
 
     let mut blobs = vec![];
     for (extrinsic_index, e) in extrinsics.iter().enumerate() {
