@@ -16,3 +16,4 @@ zombienet/
 
 # dotfiles in the repo root
 /.*
+shell.nix

@@ -30,12 +30,12 @@ RUN \
         cmake \
         make
 
-WORKDIR /sugondat
-COPY . /sugondat
-
 RUN \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain $RUSTC_VERSION
 RUN $CARGO_HOME/bin/rustup target add wasm32-unknown-unknown
+
+WORKDIR /sugondat
+COPY . /sugondat
 
 # The stages below are targets.
 
@@ -59,9 +59,22 @@ FROM ubuntu:20.04 as sugondat-release-bin
 COPY --from=sugondat-release-bin-build /cargo_target/release/sugondat-node /usr/bin/
 COPY --from=sugondat-release-bin-build /cargo_target/release/sugondat-shim /usr/bin/
 
+# docker build --platform linux/amd64 -f ci/buildbase-sugondat.Dockerfile --target sugondat-node -t ghcr.io/pepyakin/blobs-node:latest .
+FROM ubuntu:20.04 as sugondat-node
+COPY --from=sugondat-release-bin-build /cargo_target/release/sugondat-node /usr/bin/
+# TODO: EXPOSE
+# TODO: CMD
+ENTRYPOINT /usr/bin/sugondat-node
+
 # docker build --platform linux/amd64 -f ci/buildbase-sugondat.Dockerfile --target sugondat-shim -t ghcr.io/pepyakin/blobs-shim:latest .
 FROM ubuntu:20.04 as sugondat-shim
-COPY --from=basebuild-sugondat-shim-release /cargo_target/release/sugondat-shim /usr/bin
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+# COPY --from=basebuild-sugondat-shim-release /cargo_target/release/sugondat-shim /usr/bin
+COPY --from=sugondat-release-bin-build /cargo_target/release/sugondat-shim /usr/bin/
 EXPOSE 10995
-ENTRYPOINT /usr/bin/sugondat-shim
+ENTRYPOINT ["/tini", "--", "/usr/bin/sugondat-shim"]
 CMD ["serve", "-p", "10995"]

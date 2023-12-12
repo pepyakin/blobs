@@ -4,14 +4,19 @@ name: sugondat
 
 services:
   zombienet:
-    image: # TODO the image here
+    image: ghcr.io/pepyakin/blobs-demostand:latest
     networks:
       - local
   shim:
     image: ghcr.io/pepyakin/blobs-shim:latest
+    depends_on:
+      zombienet:
+        condition: service_healthy
     networks:
       - local
-
+    environment:
+      - RUST_LOG=sugondat=trace
+    command: ["serve", "-p", "10995", "--node-url=ws://zombienet:9988"]
   gm:
     image: ghcr.io/pepyakin/blobs-demo-gm:latest
     networks: 
