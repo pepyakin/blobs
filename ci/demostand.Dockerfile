@@ -26,10 +26,11 @@ COPY --from=parity/polkadot:v1.4.0 /usr/lib/polkadot/polkadot-prepare-worker /us
 COPY --from=parity/polkadot:v1.4.0 /usr/lib/polkadot/polkadot-execute-worker /usr/bin/
 
 COPY --from=ghcr.io/pepyakin/blobs-node:latest /usr/bin/sugondat-node /usr/bin/
-COPY ./testnet.toml /tmp/testnet.toml
+COPY ./testnet.toml /testnet.toml
 
 EXPOSE 9988
 HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
   CMD curl -s -XPOST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":0,"method":"system_health"}' http://localhost:9988/
 
-CMD ["zombienet", "spawn", "--provider=native", "-d/tmp/zombienet", "/tmp/testnet.toml"]
+VOLUME /zombienet
+CMD ["zombienet", "spawn", "--provider=native", "-d/zombienet/data", "/testnet.toml"]

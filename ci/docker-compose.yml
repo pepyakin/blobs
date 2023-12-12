@@ -1,30 +1,20 @@
-# TODO: Do I need an explicit declaration of networks?
-
 name: sugondat
 
 services:
   zombienet:
     image: ghcr.io/pepyakin/blobs-demostand:latest
-    networks:
-      - local
+    # Mount /zombienet as tmpfs so as to avoid zombienet prompting if it should ignore existing 
+    # directory.
+    tmpfs: /zombienet
   shim:
     image: ghcr.io/pepyakin/blobs-shim:latest
     depends_on:
       zombienet:
         condition: service_healthy
-    networks:
-      - local
     environment:
       - RUST_LOG=sugondat=trace
-    command: ["serve", "-p", "10995", "--node-url=ws://zombienet:9988"]
+    command: ["serve", "-p", "10995", "--node-url=ws://zombienet:9988", "--submit-dev-alice"]
   gm:
     image: ghcr.io/pepyakin/blobs-demo-gm:latest
-    networks: 
-      - local
   sov:
     image: ghcr.io/pepyakin/blobs-demo-sov:latest
-    networks:
-      - local
-
-networks:
-  local: {}
