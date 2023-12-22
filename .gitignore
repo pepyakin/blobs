@@ -3,8 +3,10 @@
 .idea
 .vscode
 .envrc
+*.swp
 
 /zombienet
 /demo/sovereign/target
 /demo/sovereign/demo-rollup/demo_data
 /target
+/private

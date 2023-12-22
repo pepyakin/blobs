@@ -1,5 +1,3 @@
-# docker build --platform linux/amd64 -f ci/buildbase-sugondat.Dockerfile --target sugondat-node-release -t ghcr.io/pepyakin/blobs-buildbase-sugondat-node-release:latest .
-
 FROM ubuntu:20.04 as builder
 
 # TODO: update this
@@ -73,8 +71,16 @@ ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
-# COPY --from=basebuild-sugondat-shim-release /cargo_target/release/sugondat-shim /usr/bin
 COPY --from=sugondat-release-bin-build /cargo_target/release/sugondat-shim /usr/bin/
+
+# Install `curl` to enable health check.
+RUN \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        curl
+
 EXPOSE 10995
+
+# See https://github.com/thrumdev/blobs/issues/112
 ENTRYPOINT ["/tini", "--", "/usr/bin/sugondat-shim"]
 CMD ["serve", "-p", "10995"]

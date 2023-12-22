@@ -18,6 +18,7 @@ RUN apt update \
     && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ca-certificates curl \
     && rm -rf /var/lib/apt/lists/* 
 
+
 ADD https://github.com/paritytech/zombienet/releases/download/v1.3.86/zombienet-linux-x64 /usr/bin/zombienet
 RUN chmod +x /usr/bin/zombienet
 
@@ -29,8 +30,6 @@ COPY --from=ghcr.io/pepyakin/blobs-node:latest /usr/bin/sugondat-node /usr/bin/
 COPY ./testnet.toml /testnet.toml
 
 EXPOSE 9988
-HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
-  CMD curl -s -XPOST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":0,"method":"system_health"}' http://localhost:9988/
 
 VOLUME /zombienet
 CMD ["zombienet", "spawn", "--provider=native", "-d/zombienet/data", "/testnet.toml"]

@@ -6,13 +6,15 @@
 
 .git
 !.git/HEAD
-ci
-bin
-target
-demo/sovereign/target
-demo/sovereign/demo-rollup/demo_data
-zombienet/
+/ci
+!/ci/rollup_config.docker.toml
+/bin
+/target
+/demo/sovereign/target
+/demo/sovereign/demo-rollup/demo_data
+/zombienet/
 /docker/
+/private/
 
 # dotfiles in the repo root
 /.*

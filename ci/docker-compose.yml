@@ -14,7 +14,22 @@ services:
     environment:
       - RUST_LOG=sugondat=trace
     command: ["serve", "-p", "10995", "--node-url=ws://zombienet:9988", "--submit-dev-alice"]
+    # Health check.
+    #
+    # Note that if JSON-RPC returns an error, the health check will succeed. It's fine for now.
+    healthcheck:
+      test: [
+        "CMD-SHELL", 
+        "curl -s -XPOST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"sovereign_getBlock\", \"params\":[1, [0, 0, 0, 0]]}' http://localhost:10995/"]
   gm:
     image: ghcr.io/pepyakin/blobs-demo-gm:latest
   sov:
     image: ghcr.io/pepyakin/blobs-demo-sov:latest
+    depends_on:
+      shim:
+        condition: service_healthy
+    # Don't persist the rollup data directory.
+    tmpfs: /demo_data
+    # This unites the Linux network namespace with the one of the `shim` service. That means that
+    # shim will be available via localhost.
+    network_mode: "service:shim"
